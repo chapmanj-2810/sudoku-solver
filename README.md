@@ -1,2 +1,2 @@
 # sudoku-solver
-Python code to exhaustively solve sudoku problems.
+Python code (in progress) to exhaustively solve sudoku problems.
