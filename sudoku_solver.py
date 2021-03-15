@@ -1,8 +1,8 @@
 import numpy as np
-from itertools import permutations
+from itertools import permutations, product
 
-test_case = np.genfromtxt('sudoku_test.csv', delimiter=',', dtype=int) 
-test_solution = np.genfromtxt('sudoku_sols.csv', delimiter=',', dtype=int) 
+test_case = np.genfromtxt('hard_sudoku.txt', delimiter=',', dtype=int) 
+test_solution = np.genfromtxt('hard_sudoku_sol.txt', delimiter=',', dtype=int) 
 
 def iterFlatten(root):
 	'''iterFlatten takes a nested list input and yields a flattened list where every element contained within the nested list
@@ -14,54 +14,28 @@ def iterFlatten(root):
 	else:
 		yield root
 
-values, counts = np.unique(test_case, return_counts=True) #The different values found within the grid and their frequencies.
-missing_numbers = [[value]*(9-count) for value,count in zip(values,counts) if value != 0 and count != 0]
-missing_numbers_flatlist = list(iterFlatten(missing_numbers))
-
-unique_combinations = set(permutations(missing_numbers_flatlist, len(missing_numbers_flatlist)))
-
-combo = [8,2,8,3]
-
-x_ind, y_ind = np.where(test_case==0)
-indices = np.column_stack([x_ind, y_ind])
-
-for val,ind in zip(combo, indices):
-	test_case[ind[0], ind[1]] = val
-		
-
-print(test_case)
-
-
-
-
-
-'''def sudoku_solver(puzzle):
-
+def sudoku_solver(puzzle):
 	values, counts = np.unique(puzzle, return_counts=True) #The different values found within the grid and their frequencies.
-	missing_numbers = [] #Empty list for the numbers missing from the grid.
+	missing_numbers = [[value]*(9-count) for value,count in zip(values,counts) if value != 0 and count != 0]
+	missing_numbers_flatlist = list(iterFlatten(missing_numbers))
 
-	for i in range(len(values)):
-		inter_list = [values[i]] * (9-counts[i]) #Generates list of the numbers missing from the grid.
-		missing_numbers.append(inter_list)
-	print(missing_numbers)
-	missing_numbers = list(iterFlatten(missing_numbers)) #Removes the nested lists to create one list containing all of the missing numbers.
-	generator = [j for j in missing_numbers if j>0] #Get rid of zeros which are placer numbers.
-	combinations = [] #Empty list to place the different combinations.
-			
-				for subset in permutations(generator):
-					if list(subset) not in combinations: #Check to see if the combination is already present.
-						combinations.append(list(subset))
-			
-				for combo in combinations:
-			
-					for (ind_x, ind_y), value in np.ndenumerate(puzzle):
-			
-						column = puzzle[:, ind_y] #All of the values in the same column as the value.
-						row = puzzle[ind_x, :] #All of the values in the same row as the value.
-			
-						if value == 0:
-							value = combo[number]
-			
-				return(test_solution)'''
+	unique_combinations = set(permutations(missing_numbers_flatlist, len(missing_numbers_flatlist)))
 
-#print(sudoku_solver(test_case).all() == test_solution.all()) #Check to see if the calculated grid is the same as the solution.
+	x_ind, y_ind = np.where(puzzle==0)
+	indices = np.column_stack([x_ind, y_ind])
+
+	for combo in unique_combinations:
+
+		for val,ind in zip(combo, indices):
+			puzzle[ind[0], ind[1]] = val		
+
+		if len(set(puzzle[:,0]))==9 & len(set(puzzle[:,1]))==9 & len(set(puzzle[:,2]))==9 & len(set(puzzle[:,3]))==9 & len(set(puzzle[:,4]))==9 & len(set(puzzle[:,5]))==9 & len(set(puzzle[:,6]))==9 & len(set(puzzle[:,7]))==9 & len(set(puzzle[:,8]))==9 & len(set(puzzle[0,:]))==9 & len(set(puzzle[1,:]))==9 & len(set(puzzle[2,:]))==9  & len(set(puzzle[3,:]))==9 & len(set(puzzle[4,:]))==9 & len(set(puzzle[5,:]))==9 & len(set(puzzle[6,:]))==9 & len(set(puzzle[7,:]))==9  & len(set(puzzle[8,:]))==9:
+			if len(set(puzzle[:3,:3].flatten()))==9 & len(set(puzzle[:3,3:6].flatten()))==9 & len(set(puzzle[:3,6:].flatten()))==9 & len(set(puzzle[3:6,:3].flatten()))==9 & len(set(puzzle[3:6,3:6].flatten()))==9 & len(set(puzzle[3:6,6:].flatten()))==9 & len(set(puzzle[6:,:3].flatten()))==9 & len(set(puzzle[6:,3:6].flatten()))==9 & len(set(puzzle[6:,6:].flatten()))==9:
+				return(puzzle)
+			else:
+				continue
+		else:
+			continue
+				
+print(sudoku_solver(test_case))
+print('The solution found is: {}'.format((sudoku_solver(test_case)==test_solution).all()))
